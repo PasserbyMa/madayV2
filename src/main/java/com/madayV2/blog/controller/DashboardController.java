@@ -10,7 +10,7 @@ import com.madayV2.blog.service.SqlService;
 
 @Controller
 public class DashboardController {
-	//sql 연습 가능한 기능
+	//sql 연습 가능한 기능(test)
     @Autowired private PostService postService;
     @Autowired private SqlService sqlService;
 

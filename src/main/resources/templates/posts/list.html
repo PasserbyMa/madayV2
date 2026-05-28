@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MA_BLOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="site-header">
+        <span class="logo">> MA_BLOG</span>
+        <nav>
+            <a href="/posts">HOME</a>
+            <a href="/posts/write" sec:authorize="isAuthenticated()">WRITE</a>
+            <a href="/logout" sec:authorize="isAuthenticated()">LOGOUT</a>
+            <a href="/login" sec:authorize="!isAuthenticated()">LOGIN</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <ul class="post-list">
+            <li class="post-item" th:each="post : ${posts}">
+                <a class="post-title" th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a>
+                <div class="post-meta">
+                    <span class="category-tag" th:text="${post.category}"></span>
+                    <span th:text="${post.createdAt}"></span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

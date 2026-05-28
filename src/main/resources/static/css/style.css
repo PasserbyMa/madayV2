@@ -124,17 +124,6 @@ h1, h2, h3 { color: #fff; font-family: 'VT323', monospace; }
 .btn-danger { border-color: #ff3333; color: #ff3333; }
 .btn-danger:hover { background: rgba(255,51,51,0.2); }
 
-/* 페이징 */
-.pagination { margin-top: 20px; text-align: center; }
-.pagination a, .pagination span {
-    display: inline-block;
-    padding: 5px 12px;
-    margin: 0 3px;
-    border: 1px solid #00ff41;
-    color: #00ff41;
-}
-.pagination .active { background: #00ff41; color: #000; }
-
 /* 모달 */
 .modal-overlay {
     display: none;

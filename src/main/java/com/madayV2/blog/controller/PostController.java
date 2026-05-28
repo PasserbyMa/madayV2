@@ -54,12 +54,6 @@ public class PostController {
 	// 글 저장
 	@PostMapping("/write")
 	public String write(@ModelAttribute PostDto post, Principal principal) {
-		
-	    System.out.println("=== SAVE 클릭 ===");
-	    System.out.println("title=" + post.getTitle());
-	    System.out.println("content=" + post.getContent());
-	    System.out.println("category=" + post.getCategory());
-	    System.out.println("author=" + post.getAuthor());
 	    post.setAuthor(principal.getName());
 	    postService.create(post);
 		return "redirect:/posts";

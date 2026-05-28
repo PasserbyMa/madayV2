@@ -1,0 +1,22 @@
+name: Deploy to OCI
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy via SSH
+              uses: appleboy/ssh-action@v1
+              with:
+                  host: 129.154.55.20
+                  username: ubuntu
+                  key: ${{ secrets.OCI_SSH_KEY }}
+                  script: |
+                      cd /home/ubuntu/java-blog/app
+                      git pull origin main
+                      cd /home/ubuntu/java-blog
+                      docker compose build app
+                      docker compose up -d

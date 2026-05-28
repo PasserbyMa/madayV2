@@ -1,0 +1,10 @@
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521/FREEPDB1
+spring.datasource.username=bloguser
+spring.datasource.password=YOUR_PASSWORD_HERE
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+mybatis.mapper-locations=classpath:mapper/*.xml
+mybatis.type-aliases-package=com.madayV2.blog.dto
+mybatis.configuration.map-underscore-to-camel-case=true
+mybatis.configuration.jdbc-type-for-null=NULL
+spring.thymeleaf.cache=false
+server.port=8080

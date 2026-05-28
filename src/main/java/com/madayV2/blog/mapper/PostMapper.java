@@ -3,7 +3,7 @@ package com.madayV2.blog.mapper;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import com.madayV2.blog.dto.PostDto;
-
+import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface PostMapper {
 	List<PostDto> findAll();
@@ -15,6 +15,9 @@ public interface PostMapper {
 	void update(PostDto post);
 
 	void delete(Long id);
+	
+	List<PostDto> findPage(@Param("offset") int offset, @Param("limit") int limit);
+	int count();
 }
 
 /*

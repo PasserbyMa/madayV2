@@ -32,5 +32,14 @@
     <delete id="delete" parameterType="Long">
         DELETE FROM posts WHERE id = #{id}
     </delete>
-
+    
+	<select id="findPage" resultType="PostDto">
+	    SELECT id, title, content, category, author, created_at, updated_at
+	    FROM posts ORDER BY created_at DESC
+	    OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
+	</select>
+	
+	<select id="count" resultType="int">
+	    SELECT COUNT(*) FROM posts
+	</select>
 </mapper>

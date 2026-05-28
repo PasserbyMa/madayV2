@@ -18,14 +18,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/posts", "/posts/{id}").permitAll()  // 목록, 상세는 누구나
-                .requestMatchers("/css/**").permitAll()                // CSS 파일 허용
-                .anyRequest().authenticated()                          // 나머지는 로그인 필요
-            )
+        	.authorizeHttpRequests(auth -> auth
+        	    .requestMatchers("/", "/posts", "/posts/{id}", "/posts/{id}/data").permitAll()
+        	    .requestMatchers("/css/**").permitAll()
+        	    .requestMatchers("/sql/**").authenticated()
+        	    .anyRequest().authenticated()
+        	)
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/posts")
+                .defaultSuccessUrl("/posts", true)
                 .permitAll()
             )
             .logout(logout -> logout

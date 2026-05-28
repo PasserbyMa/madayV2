@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.madayV2.blog.dto.PostDto;
 import com.madayV2.blog.service.PostService;
@@ -21,7 +22,7 @@ public class PostController {
 
 	@Autowired
 	private PostService postService;
-
+	
 	// 글 목록
 	@GetMapping
 	public String list(Model model) {
@@ -35,6 +36,12 @@ public class PostController {
 	public String detail(@PathVariable Long id, Model model) {
 		model.addAttribute("post", postService.getById(id));
 		return "posts/detail";
+	}
+	
+	@GetMapping("/{id}/data")
+	@ResponseBody
+	public PostDto data(@PathVariable Long id) {
+	    return postService.getById(id);
 	}
 
 	// 글 작성 폼

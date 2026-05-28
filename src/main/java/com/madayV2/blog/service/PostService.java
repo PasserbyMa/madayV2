@@ -34,4 +34,12 @@ public class PostService {
 	public void remove(Long id) {
 		postMapper.delete(id);
 	}
+	public List<PostDto> getPage(int page, int size) {
+	    return postMapper.findPage(page * size, size);
+	}
+
+	public int getTotalPages(int size) {
+	    int total = postMapper.count();
+	    return (int) Math.ceil((double) total / size);
+	}
 }

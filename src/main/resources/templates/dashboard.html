@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MA_BLOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header class="site-header">
+    <span class="logo">> MA_BLOG</span>
+    <nav>
+        <a href="/">HOME</a>
+        <a href="/posts/write" sec:authorize="isAuthenticated()">WRITE</a>
+        <a href="/logout" sec:authorize="isAuthenticated()">LOGOUT</a>
+        <a href="/login" sec:authorize="!isAuthenticated()">LOGIN</a>
+    </nav>
+</header>
+
+<div class="dashboard">
+    <!-- SQL 패널 -->
+    <div class="panel panel-sql">
+        <div class="panel-title">> SQL_CONSOLE</div>
+        <div sec:authorize="!isAuthenticated()" class="sql-auth-msg">[ 로그인 후 사용 가능 ]</div>
+        <div sec:authorize="isAuthenticated()">
+            <textarea id="sqlInput" class="sql-input" placeholder="SELECT * FROM posts;"></textarea>
+            <div style="margin-top:10px">
+                <button id="sqlRun" class="btn">▶ 실행</button>
+                <button id="sqlClear" class="btn" style="margin-left:8px">CLR</button>
+            </div>
+            <div id="sqlResult" class="sql-result"></div>
+        </div>
+    </div>
+
+    <!-- 포스트 패널 -->
+    <div class="panel panel-posts">
+        <div class="panel-title">> POSTS</div>
+        <div th:if="${#lists.isEmpty(posts)}" class="sql-auth-msg">게시물이 없습니다.</div>
+        <ul class="post-list">
+            <li class="post-item" th:each="post : ${posts}">
+                <a class="post-title post-link" href="#"
+                   th:text="${post.title}" th:data-id="${post.id}"></a>
+                <div class="post-meta">
+                    <span class="category-tag" th:text="${post.category}"></span>
+                    <span th:text="${post.createdAt}"></span>
+                </div>
+            </li>
+        </ul>
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a class="page-btn" th:classappend="${currentPage == 0} ? 'disabled'"
+               th:href="@{/(page=${currentPage - 1})}">&lt;</a>
+            <a class="page-btn"
+               th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+               th:text="${i + 1}"
+               th:classappend="${i == currentPage} ? 'active'"
+               th:href="@{/(page=${i})}"></a>
+            <a class="page-btn" th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
+               th:href="@{/(page=${currentPage + 1})}">&gt;</a>
+        </div>
+    </div>
+</div>
+
+<!-- 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+        <button class="modal-close" id="modalClose">[X]</button>
+        <div class="modal-header">
+            <span class="category-tag" id="modalCategory"></span>
+            <h2 id="modalTitle"></h2>
+            <div class="post-meta" id="modalDate"></div>
+        </div>
+        <div class="modal-content" id="modalContent"></div>
+        <div class="modal-footer" id="modalFooter"></div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const isAuth = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
+    const csrfToken = /*[[${_csrf.token}]]*/ '';
+    const csrfHeader = /*[[${_csrf.headerName}]]*/ 'X-CSRF-TOKEN';
+    const csrfParam = /*[[${_csrf.parameterName}]]*/ '_csrf';
+
+    // 모달
+    document.querySelectorAll('.post-link').forEach(link => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const res = await fetch(`/posts/${link.dataset.id}/data`);
+            const post = await res.json();
+            document.getElementById('modalCategory').textContent = post.category || '';
+            document.getElementById('modalTitle').textContent = post.title;
+            document.getElementById('modalDate').textContent =
+                post.createdAt ? new Date(post.createdAt).toLocaleDateString('ko-KR') : '';
+            document.getElementById('modalContent').textContent = post.content;
+            document.getElementById('modalFooter').innerHTML = isAuth ? `
+                <a href="/posts/edit/${post.id}" class="btn">수정</a>
+                <form action="/posts/delete/${post.id}" method="post" style="display:inline">
+                    <input type="hidden" name="${csrfParam}" value="${csrfToken}">
+                    <button type="submit" class="btn btn-danger">삭제</button>
+                </form>` : '';
+            document.getElementById('modalOverlay').classList.add('active');
+        });
+    });
+    document.getElementById('modalClose').addEventListener('click', () =>
+        document.getElementById('modalOverlay').classList.remove('active'));
+    document.getElementById('modalOverlay').addEventListener('click', e => {
+        if (e.target.id === 'modalOverlay')
+            document.getElementById('modalOverlay').classList.remove('active');
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('active');
+    });
+
+    // SQL 실행
+    if (isAuth) {
+        document.getElementById('sqlRun').addEventListener('click', async () => {
+            const sql = document.getElementById('sqlInput').value.trim();
+            if (!sql) return;
+            const resultDiv = document.getElementById('sqlResult');
+            resultDiv.innerHTML = '<div class="sql-loading">실행 중...</div>';
+            try {
+                const res = await fetch('/sql/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+                    body: JSON.stringify({ sql })
+                });
+                const data = await res.json();
+                if (data.type === 'error') {
+                    resultDiv.innerHTML = `<div class="sql-error">ERROR: ${data.message}</div>`;
+                } else if (data.type === 'select') {
+                    resultDiv.innerHTML = renderTable(data.rows, data.count);
+                } else {
+                    resultDiv.innerHTML = `<div class="sql-ok">OK — ${data.affected ?? 0}행 영향받음</div>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<div class="sql-error">ERROR: ${e.message}</div>`;
+            }
+        });
+        document.getElementById('sqlClear').addEventListener('click', () => {
+            document.getElementById('sqlInput').value = '';
+            document.getElementById('sqlResult').innerHTML = '';
+        });
+    }
+
+    function renderTable(rows, count) {
+        if (!rows || rows.length === 0) return '<div class="sql-ok">결과 없음 (0행)</div>';
+        const cols = Object.keys(rows[0]);
+        let html = `<div class="sql-count">${count}행 반환</div><div class="sql-table-wrap"><table class="sql-table"><thead><tr>`;
+        cols.forEach(c => html += `<th>${c}</th>`);
+        html += '</tr></thead><tbody>';
+        rows.forEach(row => {
+            html += '<tr>';
+            cols.forEach(c => html += `<td>${row[c] ?? 'NULL'}</td>`);
+            html += '</tr>';
+        });
+        return html + '</tbody></table></div>';
+    }
+</script>
+</body>
+</html>

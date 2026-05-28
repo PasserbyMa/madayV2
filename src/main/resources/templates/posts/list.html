@@ -1,31 +1,90 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MA_BLOG</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-    <header class="site-header">
-        <span class="logo">> MA_BLOG</span>
-        <nav>
-            <a href="/posts">HOME</a>
-            <a href="/posts/write" sec:authorize="isAuthenticated()">WRITE</a>
-            <a href="/logout" sec:authorize="isAuthenticated()">LOGOUT</a>
-            <a href="/login" sec:authorize="!isAuthenticated()">LOGIN</a>
-        </nav>
-    </header>
+<header class="site-header">
+    <span class="logo">> MA_BLOG</span>
+    <nav>
+        <a href="/posts">HOME</a>
+        <a href="/posts/write" sec:authorize="isAuthenticated()">WRITE</a>
+        <a href="/logout" sec:authorize="isAuthenticated()">LOGOUT</a>
+        <a href="/login" sec:authorize="!isAuthenticated()">LOGIN</a>
+    </nav>
+</header>
 
-    <div class="container">
-        <ul class="post-list">
-            <li class="post-item" th:each="post : ${posts}">
-                <a class="post-title" th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}"></a>
-                <div class="post-meta">
-                    <span class="category-tag" th:text="${post.category}"></span>
-                    <span th:text="${post.createdAt}"></span>
-                </div>
-            </li>
-        </ul>
+<div class="container">
+    <ul class="post-list">
+        <li class="post-item" th:each="post : ${posts}">
+            <a class="post-title post-link" href="#"
+               th:text="${post.title}"
+               th:data-id="${post.id}"></a>
+            <div class="post-meta">
+                <span class="category-tag" th:text="${post.category}"></span>
+                <span th:text="${post.createdAt}"></span>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<!-- 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+        <button class="modal-close" id="modalClose">[X]</button>
+        <div class="modal-header">
+            <span class="category-tag" id="modalCategory"></span>
+            <h2 id="modalTitle"></h2>
+            <div class="post-meta" id="modalDate"></div>
+        </div>
+        <div class="modal-content" id="modalContent"></div>
+        <div class="modal-footer" id="modalFooter"></div>
     </div>
+</div>
+
+<script th:inline="javascript">
+    const isAuth = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
+    const csrfToken = /*[[${_csrf.token}]]*/ '';
+    const csrfParam = /*[[${_csrf.parameterName}]]*/ '_csrf';
+
+    document.querySelectorAll('.post-link').forEach(link => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const id = link.dataset.id;
+            const res = await fetch(`/posts/${id}/data`);
+            const post = await res.json();
+
+            document.getElementById('modalCategory').textContent = post.category || '';
+            document.getElementById('modalTitle').textContent = post.title;
+            document.getElementById('modalDate').textContent =
+                post.createdAt ? new Date(post.createdAt).toLocaleDateString('ko-KR') : '';
+            document.getElementById('modalContent').textContent = post.content;
+
+            const footer = document.getElementById('modalFooter');
+            footer.innerHTML = isAuth ? `
+                <a href="/posts/edit/${post.id}" class="btn">수정</a>
+                <form action="/posts/delete/${post.id}" method="post" style="display:inline">
+                    <input type="hidden" name="${csrfParam}" value="${csrfToken}">
+                    <button type="submit" class="btn btn-danger">삭제</button>
+                </form>` : '';
+
+            document.getElementById('modalOverlay').classList.add('active');
+        });
+    });
+
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalOverlay').addEventListener('click', e => {
+        if (e.target.id === 'modalOverlay') closeModal();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+    }
+</script>
 </body>
 </html>

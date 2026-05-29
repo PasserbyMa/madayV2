@@ -20,3 +20,10 @@ jobs:
                       cd /home/ubuntu/java-blog
                       docker-compose build app
                       docker-compose up -d
+script: |
+    cd /home/ubuntu/java-blog/app
+    git pull origin main
+    cd /home/ubuntu/java-blog
+    docker-compose build app
+    docker-compose up -d
+    docker network connect mam_mablog_network javablog_app || true

@@ -11,10 +11,10 @@
 <header class="site-header">
     <span class="logo">> MA_BLOG</span>
     <nav>
-        <a href="/posts">HOME</a>
-        <a href="/posts/write" sec:authorize="isAuthenticated()">WRITE</a>
-        <a href="/logout" sec:authorize="isAuthenticated()">LOGOUT</a>
-        <a href="/login" sec:authorize="!isAuthenticated()">LOGIN</a>
+        <a th:href="@{/posts}">HOME</a>
+        <a th:href="@{/posts/write}" sec:authorize="isAuthenticated()">WRITE</a>
+        <a th:href="@{/logout}" sec:authorize="isAuthenticated()">LOGOUT</a>
+        <a th:href="@{/login}" sec:authorize="!isAuthenticated()">LOGIN</a>
     </nav>
 </header>
 
@@ -50,12 +50,13 @@
     const isAuth = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
     const csrfToken = /*[[${_csrf.token}]]*/ '';
     const csrfParam = /*[[${_csrf.parameterName}]]*/ '_csrf';
+    const contextPath = /*[[${ctx}]]*/ '';
 
     document.querySelectorAll('.post-link').forEach(link => {
         link.addEventListener('click', async (e) => {
             e.preventDefault();
             const id = link.dataset.id;
-            const res = await fetch(`/posts/${id}/data`);
+            const res = await fetch(`${contextPath}/posts/${id}/data`);
             const post = await res.json();
 
             document.getElementById('modalCategory').textContent = post.category || '';
@@ -66,8 +67,8 @@
 
             const footer = document.getElementById('modalFooter');
             footer.innerHTML = isAuth ? `
-                <a href="/posts/edit/${post.id}" class="btn">수정</a>
-                <form action="/posts/delete/${post.id}" method="post" style="display:inline">
+                <a href="${contextPath}/posts/edit/${post.id}" class="btn">수정</a>
+                <form action="${contextPath}/posts/delete/${post.id}" method="post" style="display:inline">
                     <input type="hidden" name="${csrfParam}" value="${csrfToken}">
                     <button type="submit" class="btn btn-danger">삭제</button>
                 </form>` : '';

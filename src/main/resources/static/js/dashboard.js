@@ -1,7 +1,7 @@
 document.querySelectorAll('.post-link').forEach(link => {
     link.addEventListener('click', async (e) => {
         e.preventDefault();
-        const res = await fetch(`/posts/${link.dataset.id}/data`);
+        const res = await fetch(`${contextPath}/posts/${link.dataset.id}/data`);
         const post = await res.json();
         document.getElementById('modalCategory').textContent = post.category || '';
         document.getElementById('modalTitle').textContent = post.title;
@@ -9,8 +9,8 @@ document.querySelectorAll('.post-link').forEach(link => {
             post.createdAt ? new Date(post.createdAt).toLocaleDateString('ko-KR') : '';
         document.getElementById('modalContent').textContent = post.content;
         document.getElementById('modalFooter').innerHTML = isAuth ? `
-            <a href="/posts/edit/${post.id}" class="btn">수정</a>
-            <form action="/posts/delete/${post.id}" method="post" style="display:inline">
+            <a href="${contextPath}/posts/edit/${post.id}" class="btn">수정</a>
+            <form action="${contextPath}/posts/delete/${post.id}" method="post" style="display:inline">
                 <input type="hidden" name="${csrfParam}" value="${csrfToken}">
                 <button type="submit" class="btn btn-danger">삭제</button>
             </form>` : '';
@@ -35,7 +35,7 @@ if (isAuth) {
         const resultDiv = document.getElementById('sqlResult');
         resultDiv.innerHTML = '<div class="sql-loading">실행 중...</div>';
         try {
-            const res = await fetch('/sql/execute', {
+            const res = await fetch(`${contextPath}/sql/execute`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
                 body: JSON.stringify({ sql })

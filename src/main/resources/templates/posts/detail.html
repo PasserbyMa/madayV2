@@ -10,10 +10,10 @@
     <header class="site-header">
         <span class="logo">> MA_BLOG</span>
         <nav>
-            <a href="/posts">HOME</a>
-            <a href="/posts/write" sec:authorize="isAuthenticated()">WRITE</a>
-            <a href="/logout" sec:authorize="isAuthenticated()">LOGOUT</a>
-            <a href="/login" sec:authorize="!isAuthenticated()">LOGIN</a>
+            <a th:href="@{/posts}">HOME</a>
+            <a th:href="@{/posts/write}" sec:authorize="isAuthenticated()">WRITE</a>
+            <a th:href="@{/logout}" sec:authorize="isAuthenticated()">LOGOUT</a>
+            <a th:href="@{/login}" sec:authorize="!isAuthenticated()">LOGIN</a>
         </nav>
     </header>
 
@@ -27,7 +27,7 @@
         <div class="post-content" th:text="${post.content}"></div>
 
         <div style="margin-top:30px; border-top:1px solid #00ff41; padding-top:15px;">
-            <a href="/posts" class="btn">목록</a>
+            <a th:href="@{/posts}" class="btn">목록</a>
             <a th:href="@{/posts/edit/{id}(id=${post.id})}" class="btn"
                sec:authorize="isAuthenticated()">수정</a>
             <form th:action="@{/posts/delete/{id}(id=${post.id})}" method="post"

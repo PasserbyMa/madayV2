@@ -11,10 +11,10 @@
 <header class="site-header">
     <span class="logo">> MA_BLOG</span>
     <nav>
-        <a href="/">HOME</a>
-        <a href="/posts/write" sec:authorize="isAuthenticated()">WRITE</a>
-        <a href="/logout" sec:authorize="isAuthenticated()">LOGOUT</a>
-        <a href="/login" sec:authorize="!isAuthenticated()">LOGIN</a>
+        <a th:href="@{/}">HOME</a>
+        <a th:href="@{/posts/write}" sec:authorize="isAuthenticated()">WRITE</a>
+        <a th:href="@{/logout}" sec:authorize="isAuthenticated()">LOGOUT</a>
+        <a th:href="@{/login}" sec:authorize="!isAuthenticated()">LOGIN</a>
     </nav>
 </header>
 
@@ -78,6 +78,7 @@
     const csrfToken = /*[[${_csrf.token}]]*/ '';
     const csrfHeader = /*[[${_csrf.headerName}]]*/ 'X-CSRF-TOKEN';
     const csrfParam = /*[[${_csrf.parameterName}]]*/ '_csrf';
+    const contextPath = /*[[${ctx}]]*/ '';
 </script>
 <script th:src="@{/js/dashboard.js}"></script>
 </body>

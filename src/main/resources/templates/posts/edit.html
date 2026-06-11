@@ -9,8 +9,8 @@
     <header class="site-header">
         <span class="logo">> MA_BLOG</span>
         <nav>
-            <a href="/posts">HOME</a>
-            <a href="/logout">LOGOUT</a>
+            <a th:href="@{/posts}">HOME</a>
+            <a th:href="@{/logout}">LOGOUT</a>
         </nav>
     </header>
 
@@ -32,7 +32,7 @@
             </div>
             <div style="margin-top:10px;">
                 <button type="submit" class="btn">> UPDATE</button>
-                <a href="/posts" class="btn">CANCEL</a>
+                <a th:href="@{/posts}" class="btn">CANCEL</a>
             </div>
         </form>
     </div>

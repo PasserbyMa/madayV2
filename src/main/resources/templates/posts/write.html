@@ -9,14 +9,14 @@
     <header class="site-header">
         <span class="logo">> MA_BLOG</span>
         <nav>
-            <a href="/posts">HOME</a>
-            <a href="/logout">LOGOUT</a>
+            <a th:href="@{/posts}">HOME</a>
+            <a th:href="@{/logout}">LOGOUT</a>
         </nav>
     </header>
 
     <div class="container">
         <h2 style="margin-bottom:20px; color:#00ff41;">> NEW POST</h2>
-        <form action="/posts/write" method="post">
+        <form th:action="@{/posts/write}" method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <div class="form-group">
                 <label>TITLE</label>
@@ -32,7 +32,7 @@
             </div>
             <div style="margin-top:10px;">
                 <button type="submit" class="btn">> SAVE</button>
-                <a href="/posts" class="btn">CANCEL</a>
+                <a th:href="@{/posts}" class="btn">CANCEL</a>
             </div>
         </form>
     </div>

@@ -1,18 +1,18 @@
 package com.madayV2.blog.controller;
 
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.madayV2.blog.service.PostService;
 import com.madayV2.blog.service.SqlService;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 public class DashboardController {
-	//자동주입
-    @Autowired private PostService postService;
-    @Autowired private SqlService sqlService;
+    private final PostService postService;
+    private final SqlService sqlService;
 
     @GetMapping("/")
     public String dashboard(Model model, @RequestParam(defaultValue = "0") int page) {

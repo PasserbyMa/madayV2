@@ -3,7 +3,6 @@ package com.madayV2.blog.controller;
 import java.util.List;
 import java.security.Principal;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +14,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.madayV2.blog.dto.PostDto;
 import com.madayV2.blog.service.PostService;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/posts")
 public class PostController {
 
-	@Autowired
-	private PostService postService;
+	private final PostService postService;
 	
 	// 글 목록
 	@GetMapping
